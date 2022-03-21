@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
-{% block head_meta %}
-<script src="{{ url_for('static', filename='script.js') }}"/>
-{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
-{% block header %}
-  <h1>{% block title %}Dashboard{% endblock %}</h1>
+{% block head %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
-    <p>test</p>
-    <canvas id="myChart" width="400" height="400"></canvas>  
+<h1>Dashboard</h1>
+<div>
+  <canvas id="myChart" width="400" height="400"></canvas>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</div>
 {% endblock %}

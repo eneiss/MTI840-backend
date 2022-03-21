@@ -1,14 +1,12 @@
 <!doctype html>
-<head>
-    {% block head_meta %}{% endblock %}
+<html>
+  <head>
+    {% block head %}
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
     <title>{% block title %}{% endblock %} - MTI840</title>
-</head>
-
-<body>
-    <section class="content">
-        <header>
-            {% block header %}{% endblock %}
-        </header>
-        {% block content %}{% endblock %}
-    </section>
-</body>
+    {% endblock %}
+  </head>
+  <body>
+    <div id="content">{% block content %}{% endblock %}</div>
+  </body>
+</html>
