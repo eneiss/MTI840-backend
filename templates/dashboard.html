@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block head_meta %}
+<script src="{{ url_for('static', filename='script.js') }}"/>
+{% endblock %}
+
+{% block header %}
+  <h1>{% block title %}Dashboard{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <p>test</p>
+    <canvas id="myChart" width="400" height="400"></canvas>  
+{% endblock %}
