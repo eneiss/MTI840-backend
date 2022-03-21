@@ -5,12 +5,16 @@
 {% block head %}
 {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <h1>Dashboard</h1>
 <div>
-  <canvas id="myChart" width="400" height="400"></canvas>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <canvas id="chart" width="400" height="400"></canvas>
+  <script>
+    const ctx = document.getElementById('chart');
+    const main_chart = new Chart(ctx, config);
+  </script>
 </div>
 {% endblock %}
