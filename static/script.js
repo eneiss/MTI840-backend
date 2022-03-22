@@ -88,15 +88,16 @@ const options =  {
             ticks: {
                 // For a category axis, the val is the index so the lookup via getLabelForValue is needed
                 callback: function(val, index) {
-                    // Hide every 2nd tick label
+                    // Hide every 2nd tick label -> TODO: customize
                     return index % 2 === 0 ? this.getLabelForValue(val) : '';
                 },
             }
         }
+    },
+    layout: {
+        padding: 20
     }
 };
-
-// TODO: color/differentiate both axis
 
 const dummy_config = {
     type: 'line',

@@ -122,7 +122,7 @@ def get_chart_data():
 
         return Response(json.dumps({
             'size': 7,
-            'labels': ["a" for i in range(size)],       # TODO: find what to do with labels
+            'labels': ["a" for i in range(size)],       # TODO: use timestamps (maybe reformat them)
             "temperature": temperature_array,
             "humidity": humidity_array
         }), mimetype='application/json')
