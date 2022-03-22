@@ -13,10 +13,10 @@ const CHART_COLORS = {
 
 // --------------------------- End of extract
 
-const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dummy_labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const data = {
-    labels: labels,
+const dummy_data = {
+    labels: dummy_labels,
     datasets: [
         {
             label: 'Temperature',
@@ -83,9 +83,9 @@ const options =  {
 
 // TODO: color/differentiate both axis
 
-const config = {
+const dummy_config = {
     type: 'line',
-    data: data,
+    data: dummy_data,
     options: options,
 };
 
@@ -104,7 +104,40 @@ async function getChartData() {
 
 async function setupChart() {
     const ctx = document.getElementById('chart');
-    const main_chart = new Chart(ctx, config);
+    // const main_chart = new Chart(ctx, dummy_config);     // example
+
     let res = await getChartData();
     console.log(res);
+
+    let data = {
+        labels: res.labels,
+        datasets: [
+            {
+                label: 'Temperature',
+                data: res.temperature,
+                borderColor: CHART_COLORS.red,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                yAxisID: 'yT',
+                cubicInterpolationMode: 'monotone',     // looks nice but may not make sense
+                tension: 0.4
+            },
+            {
+                label: 'Humidity',
+                data: res.humidity,
+                borderColor: CHART_COLORS.blue,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                yAxisID: 'yH',
+                cubicInterpolationMode: 'monotone',     // looks nice but may not make sense
+                tension: 0.4
+            }
+        ]
+    };
+
+    let config = {
+        type: 'line',
+        data: data,
+        options: options,
+    };
+
+    const main_chart = new Chart(ctx, config);
 }

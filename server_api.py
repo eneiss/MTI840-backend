@@ -105,7 +105,7 @@ def get_chart_data():
     return Response(json.dumps({
         'size': 7,
         'labels': [c for c in "abcdefg"],
-        "temperature": [12,13,14,11,10,15,13],
+        "temperature": [1,2,3,4,5,6,7],
         "humidity": [45,47,42,43,39,45,44]
     }), mimetype='application/json')
 
