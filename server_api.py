@@ -1,7 +1,9 @@
+
 from enum import Enum
 from flask import Flask, json, request, render_template, Response
 from datetime import datetime
 import signal
+import csv
 
 # ------------------------------ CONSTANTS & ENUMS
 
@@ -45,6 +47,16 @@ def get_test():
 
 @api.route('/humiture', methods=['POST'])
 def post_humiture():
+    # with open('humiture_data.csv', mode='r', newline="") as csv_file:
+    #
+    #     csv_reader = csv.reader(csv_file, delimiter=';')
+    #
+    #     for row in csv_reader:
+    #         date = datetime.strptime(row[0], "%m/%d/%Y, %H:%M:%S")
+    #         humidity = int(row[1])
+    #         temperature = int(row[2])
+    #
+    #     print("Read line", date, "  :  ", humidity, temperature)
 
     global last_too_humid_time
     global app_state
@@ -53,6 +65,11 @@ def post_humiture():
         print(request.json)
         humidity = int(request.json['humidity'])
         temperature = int(request.json['temperature'])
+
+        # write humiture data to csv file
+        with open('humiture_data.csv', mode='a', newline="") as humiture_file:
+            humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            humiture_file_writer.writerow([datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), humidity, temperature])
 
         warning = Warnings.NONE
 
