@@ -67,6 +67,7 @@ def post_humiture():
         temperature = int(request.json['temperature'])
 
         # write humiture data to csv file
+        # TODO: open & close only once
         with open('humiture_data.csv', mode='a', newline="") as humiture_file:
             humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             humiture_file_writer.writerow([datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), humidity, temperature])
@@ -102,12 +103,29 @@ def post_humiture():
 
 @api.route('/chart_data', methods=['GET'])
 def get_chart_data():
-    return Response(json.dumps({
-        'size': 7,
-        'labels': [c for c in "abcdefg"],
-        "temperature": [1,2,3,4,5,6,7],
-        "humidity": [45,47,42,43,39,45,44]
-    }), mimetype='application/json')
+    with open('humiture_data.csv', mode='r', newline="") as csv_file:
+    
+        csv_reader = csv.reader(csv_file, delimiter=';')
+
+        temperature_array = []
+        humidity_array = []
+        size = 0
+    
+        for row in csv_reader:
+            date = datetime.strptime(row[0], "%m/%d/%Y, %H:%M:%S")
+            humidity = int(row[1])
+            temperature = int(row[2])
+
+            temperature_array.append(temperature)
+            humidity_array.append(humidity)
+            size += 1
+
+        return Response(json.dumps({
+            'size': 7,
+            'labels': ["a" for i in range(size)],       # TODO: find what to do with labels
+            "temperature": temperature_array,
+            "humidity": humidity_array
+        }), mimetype='application/json')
 
 # ------------------------------ METHODS
 
