@@ -1,5 +1,5 @@
 from enum import Enum
-from flask import Flask, json, request, render_template
+from flask import Flask, json, request, render_template, Response
 from datetime import datetime
 import signal
 
@@ -85,7 +85,12 @@ def post_humiture():
 
 @api.route('/chart_data', methods=['GET'])
 def get_chart_data():
-    return "<p>TODO</p>", 200
+    return Response(json.dumps({
+        'size': 7,
+        'labels': [c for c in "abcdefg"],
+        "temperature": [12,13,14,11,10,15,13],
+        "humidity": [45,47,42,43,39,45,44]
+    }), mimetype='application/json')
 
 # ------------------------------ METHODS
 

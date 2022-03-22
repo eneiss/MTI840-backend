@@ -88,3 +88,23 @@ const config = {
     data: data,
     options: options,
 };
+
+
+// --------------------------- Methods
+
+async function getChartData() {
+    let url = 'http://127.0.0.1:5000/chart_data';
+    try {
+        let res = await fetch(url);
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function setupChart() {
+    const ctx = document.getElementById('chart');
+    const main_chart = new Chart(ctx, config);
+    let res = await getChartData();
+    console.log(res);
+}
