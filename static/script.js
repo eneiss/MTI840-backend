@@ -50,7 +50,7 @@ const options =  {
                 label: function(context) {
                     let label = context.dataset.label || '';
                     let unit = (context.dataset.yAxisID === 'yH' ? "%" : "°C")
-
+                    
                     if (label) {
                         label += ': ';
                     }
@@ -67,6 +67,9 @@ const options =  {
             type: 'linear',
             display: true,
             position: 'left',
+            ticks: {
+                color: CHART_COLORS.red,
+            }
         },
         yH: {
             type: 'linear',
@@ -77,7 +80,19 @@ const options =  {
             grid: {
                 drawOnChartArea: false, // only want the grid lines for one axis to show up
             },
+            ticks: {
+                color: CHART_COLORS.blue,
+            }
         },
+        x: {
+            ticks: {
+                // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                callback: function(val, index) {
+                    // Hide every 2nd tick label
+                    return index % 2 === 0 ? this.getLabelForValue(val) : '';
+                },
+            }
+        }
     }
 };
 
@@ -105,10 +120,10 @@ async function getChartData() {
 async function setupChart() {
     const ctx = document.getElementById('chart');
     // const main_chart = new Chart(ctx, dummy_config);     // example
-
+    
     let res = await getChartData();
     console.log(res);
-
+    
     let data = {
         labels: res.labels,
         datasets: [
@@ -132,12 +147,12 @@ async function setupChart() {
             }
         ]
     };
-
+    
     let config = {
         type: 'line',
         data: data,
         options: options,
     };
-
+    
     const main_chart = new Chart(ctx, config);
 }
