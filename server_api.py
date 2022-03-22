@@ -83,6 +83,9 @@ def post_humiture():
         print(e)
         return json.dumps({"success": False}), 400
 
+@api.route('/chart_data', methods=['GET'])
+def get_chart_data():
+    return "<p>TODO</p>", 200
 
 # ------------------------------ METHODS
 
