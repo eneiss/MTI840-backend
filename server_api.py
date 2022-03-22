@@ -1,6 +1,7 @@
 from enum import Enum
 from flask import Flask, json, request, render_template
 from datetime import datetime
+import signal
 
 # ------------------------------ CONSTANTS & ENUMS
 
@@ -90,8 +91,14 @@ def switch_state(new_state: int):
     app_state = new_state
     print(f"switching to state {new_state}")
 
+def keyboardInterruptHandler(signal, frame):
+    print("Shutting down server...")
+    # TODO: close the csv file here
+    exit(0)
+
 # ------------------------------ MAIN
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, keyboardInterruptHandler)
     # api.run(host="0.0.0.0")     # open to the rest of the network
     api.run()

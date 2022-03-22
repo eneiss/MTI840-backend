@@ -81,6 +81,8 @@ const options =  {
     }
 };
 
+// TODO: color/differentiate both axis
+
 const config = {
     type: 'line',
     data: data,
