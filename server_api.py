@@ -33,6 +33,9 @@ api.config['TEMPLATES_AUTO_RELOAD'] = True
 
 app_state = AppState.ITSOK
 last_too_humid_time = 0
+humiture_file = open('humiture_data.csv', mode='a+', newline="")
+humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+humiture_file_reader = csv.reader(humiture_file, delimiter=';')
 
 # ------------------------------ API ROUTES
 
@@ -52,7 +55,7 @@ def post_humiture():
     #     csv_reader = csv.reader(csv_file, delimiter=';')
     #
     #     for row in csv_reader:
-    #         date = datetime.strptime(row[0], "%m/%d/%Y, %H:%M:%S")
+    #         date = datetime.strptime(row[0], "%d/%m/%Y, %H:%M:%S")
     #         humidity = int(row[1])
     #         temperature = int(row[2])
     #
@@ -60,6 +63,7 @@ def post_humiture():
 
     global last_too_humid_time
     global app_state
+    global humiture_file_writer
 
     try:
         print(request.json)
@@ -68,9 +72,8 @@ def post_humiture():
 
         # write humiture data to csv file
         # TODO: open & close only once
-        with open('humiture_data.csv', mode='a', newline="") as humiture_file:
-            humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            humiture_file_writer.writerow([datetime.now().strftime("%m/%d/%Y, %H:%M:%S"), humidity, temperature])
+        # with open('humiture_data.csv', mode='a', newline="") as humiture_file:
+        humiture_file_writer.writerow([datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature])
 
         warning = Warnings.NONE
 
@@ -103,29 +106,26 @@ def post_humiture():
 
 @api.route('/chart_data', methods=['GET'])
 def get_chart_data():
-    with open('humiture_data.csv', mode='r', newline="") as csv_file:
-    
-        csv_reader = csv.reader(csv_file, delimiter=';')
 
-        temperature_array = []
-        humidity_array = []
-        size = 0
-    
-        for row in csv_reader:
-            date = datetime.strptime(row[0], "%m/%d/%Y, %H:%M:%S")
-            humidity = int(row[1])
-            temperature = int(row[2])
+    temperature_array = []
+    humidity_array = []
+    size = 0
 
-            temperature_array.append(temperature)
-            humidity_array.append(humidity)
-            size += 1
+    for row in humiture_file_reader:
+        date = datetime.strptime(row[0], "%d/%m/%Y, %H:%M:%S")
+        humidity = int(row[1])
+        temperature = int(row[2])
 
-        return Response(json.dumps({
-            'size': 7,
-            'labels': ["a" for i in range(size)],       # TODO: find what to do with labels
-            "temperature": temperature_array,
-            "humidity": humidity_array
-        }), mimetype='application/json')
+        temperature_array.append(temperature)
+        humidity_array.append(humidity)
+        size += 1
+
+    return Response(json.dumps({
+        'size': 7,
+        'labels': ["a" for i in range(size)],       # TODO: find what to do with labels
+        "temperature": temperature_array,
+        "humidity": humidity_array
+    }), mimetype='application/json')
 
 # ------------------------------ METHODS
 
