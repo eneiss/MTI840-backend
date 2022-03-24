@@ -123,7 +123,7 @@ def get_chart_data():
     data = []
     current_point_sum = [0, 0]
     current_point_count = 0
-    print("Starting at ", curDate.strftime("%d/%m/%Y, %H:%M:%S"))
+    # print("Starting at ", curDate.strftime("%d/%m/%Y, %H:%M:%S"))
 
     line_nb = 0
     humiture_file.seek(0)
@@ -137,13 +137,16 @@ def get_chart_data():
         while date > curDate + timedelta(hours=interval):
             curDate += timedelta(hours=interval)
             if current_point_count == 0:
-                data.append([])
+                data.append(
+                    [curDate - timedelta(hours=interval),
+                     None,
+                     None])
             else:
                 data.append(
                     [curDate - timedelta(hours=interval),
                      current_point_sum[0] / current_point_count,
                      current_point_sum[1] / current_point_count])
-            print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
+            # print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
             current_point_count = 0
             current_point_sum = [0, 0]
 
@@ -158,18 +161,22 @@ def get_chart_data():
 
         # print("Read line", date, "  :  ", humidity, temperature)
 
-
-    last = []
+    last = [None, None, None]
     for i in range(len(data)):
-        if data[i] == [] and last != []:
-            data[i] = last
+        if data[i][1] is None and last[1] is not None:
+            data[i][1] = last[1]
+            data[i][2] = last[2]
         last = data[i]
 
-    last = []
+    last = [None, None, None]
     for i in range(len(data) - 1, -1, -1):
-        if data[i] == [] and last != []:
-            data[i] = last
+        if data[i][1] is None and last[1] is not None:
+            data[i][1] = last[1]
+            data[i][2] = last[2]
         last = data[i]
+
+    # for line in data :
+    #     print(line)
 
     return Response(json.dumps({
         'size': len(data),
