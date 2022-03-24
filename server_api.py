@@ -1,9 +1,15 @@
 
 from enum import Enum
 from flask import Flask, json, request, render_template, Response
-from datetime import datetime
+from datetime import datetime, timedelta
 import signal
 import csv
+import pathlib
+import os
+
+# Change current working directory to that of this file
+os.chdir(pathlib.Path(__file__).parent.resolve())
+
 
 # ------------------------------ CONSTANTS & ENUMS
 
@@ -34,8 +40,10 @@ api.config['TEMPLATES_AUTO_RELOAD'] = True
 app_state = AppState.ITSOK
 last_too_humid_time = 0
 humiture_file = open('humiture_data.csv', mode='a+', newline="")
-humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+humiture_file.seek(0)
 humiture_file_reader = csv.reader(humiture_file, delimiter=';')
+humiture_file.seek(0)
+humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
 # ------------------------------ API ROUTES
 
@@ -107,24 +115,67 @@ def post_humiture():
 @api.route('/chart_data', methods=['GET'])
 def get_chart_data():
 
-    temperature_array = []
-    humidity_array = []
-    size = 0
+    total_period = 24  # how many hours back we want to go
+    nb_points = 50
 
+    interval = total_period / nb_points  # in hours
+    curDate = datetime.now() - timedelta(hours=total_period)
+    data = []
+    current_point_sum = [0, 0]
+    current_point_count = 0
+    print("Starting at ", curDate.strftime("%d/%m/%Y, %H:%M:%S"))
+
+    line_nb = 0
+    humiture_file.seek(0)
     for row in humiture_file_reader:
+        line_nb += 1
         date = datetime.strptime(row[0], "%d/%m/%Y, %H:%M:%S")
+
+        if date < curDate:
+            continue
+
+        while date > curDate + timedelta(hours=interval):
+            curDate += timedelta(hours=interval)
+            if current_point_count == 0:
+                data.append([])
+            else:
+                data.append(
+                    [curDate - timedelta(hours=interval),
+                     current_point_sum[0] / current_point_count,
+                     current_point_sum[1] / current_point_count])
+            print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
+            current_point_count = 0
+            current_point_sum = [0, 0]
+
+        if len(data) == nb_points:
+            break
+
         humidity = int(row[1])
         temperature = int(row[2])
 
-        temperature_array.append(temperature)
-        humidity_array.append(humidity)
-        size += 1
+        current_point_sum = [current_point_sum[0] + humidity, current_point_sum[1] + temperature]
+        current_point_count += 1
+
+        # print("Read line", date, "  :  ", humidity, temperature)
+
+
+    last = []
+    for i in range(len(data)):
+        if data[i] == [] and last != []:
+            data[i] = last
+        last = data[i]
+
+    last = []
+    for i in range(len(data) - 1, -1, -1):
+        if data[i] == [] and last != []:
+            data[i] = last
+        last = data[i]
 
     return Response(json.dumps({
-        'size': 7,
-        'labels': ["a" for i in range(size)],       # TODO: use timestamps (maybe reformat them)
-        "temperature": temperature_array,
-        "humidity": humidity_array
+        'size': len(data),
+        'labels': [data[i][0] for i in range(len(data))],
+        "temperature": [data[i][2] for i in range(len(data))],
+        "humidity": [data[i][1] for i in range(len(data))]
     }), mimetype='application/json')
 
 # ------------------------------ METHODS
