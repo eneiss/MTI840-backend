@@ -38,6 +38,14 @@ const options =  {
             position: 'left',
             ticks: {
                 color: CHART_COLORS.red,
+            },
+            title: {
+                display: true,
+                text: 'Temperature (°C)',
+                color: CHART_COLORS.red,
+                font: {
+                  size: 20,
+                },
             }
         },
         yH: {
@@ -51,6 +59,14 @@ const options =  {
             },
             ticks: {
                 color: CHART_COLORS.blue,
+            },
+            title: {
+                display: true,
+                text: 'Humidity (%)',
+                color: CHART_COLORS.blue,
+                font: {
+                  size: 20,
+                },
             }
         },
         x: {
