@@ -1,43 +1,12 @@
-// -------------------------- Extract of utils.js from Charts.js
+// -------------------------- Colors taken from Charts.js' utils.js
 // https://github.com/chartjs/Chart.js/blob/master/docs/scripts/utils.js
 
 const CHART_COLORS = {
     red: 'rgb(255, 99, 132)',
-    orange: 'rgb(255, 159, 64)',
-    yellow: 'rgb(255, 205, 86)',
-    green: 'rgb(75, 192, 192)',
     blue: 'rgb(54, 162, 235)',
-    purple: 'rgb(153, 102, 255)',
-    grey: 'rgb(201, 203, 207)'
 };
 
 // --------------------------- End of extract
-
-const dummy_labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-const dummy_data = {
-    labels: dummy_labels,
-    datasets: [
-        {
-            label: 'Temperature',
-            data: [9, 11, 3, 5, 2, 3, 6],
-            borderColor: CHART_COLORS.red,
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            yAxisID: 'yT',
-            cubicInterpolationMode: 'monotone',     // looks nice but may not make sense
-            tension: 0.4
-        },
-        {
-            label: 'Humidity',
-            data: [26, 30, 34, 18, 23, 21, 39],
-            borderColor: CHART_COLORS.blue,
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            yAxisID: 'yH',
-            cubicInterpolationMode: 'monotone',     // looks nice but may not make sense
-            tension: 0.4
-        }
-    ]
-};
 
 const options =  {
     responsive: true,
@@ -99,38 +68,52 @@ const options =  {
     }
 };
 
-const dummy_config = {
-    type: 'line',
-    data: dummy_data,
-    options: options,
-};
-
+var main_chart;
 
 // --------------------------- Methods
 
-async function getChartData() {
-    let url = 'http://127.0.0.1:5000/chart_data';
+// returns a callback for the x-axis ticks for skipping labels
+function getChartTicksCallbackForInterval(interval) {
+    return function(val, index) {
+        return index % interval === 0 ? this.getLabelForValue(val) : '';
+    }
+}
+
+async function getChartDataForPeriod(period) {
+    let url = root_url + 'chart_data/' + period;
     try {
         let res = await fetch(url);
         return await res.json();
     } catch (error) {
         console.log(error);
+        return {"size": 0, "labels": [], "temperature": [], "humidity": []};
     }
 }
 
-async function setupChart() {
-    const ctx = document.getElementById('chart');
-    // const main_chart = new Chart(ctx, dummy_config);     // example
-    
-    let res = await getChartData();
+// called when the page is loaded
+async function setupChart() {    
+    let res = await getChartDataForPeriod("all")
     console.log(res);
-    
-    let data = {
-        labels: res.labels,
+    setupChartWithData(res.temperature, res.humidity, res.labels, 3)
+}
+
+// called when a button is clicked
+async function updateChartForPeriod(period) {
+    let res = await getChartDataForPeriod(period);
+    if (res.temperature !== null) {
+        // TODO: labels skip?
+        updateChartWithData(res.temperature, res.humidity, res.labels, 2);
+    }
+}
+
+function setupChartWithData(temperature, humidity, labels, labels_skip) {
+    const ctx = document.getElementById('chart');
+    let chart_data = {
+        labels: labels,
         datasets: [
             {
                 label: 'Temperature',
-                data: res.temperature,
+                data: temperature,
                 borderColor: CHART_COLORS.red,
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                 yAxisID: 'yT',
@@ -139,7 +122,7 @@ async function setupChart() {
             },
             {
                 label: 'Humidity',
-                data: res.humidity,
+                data: humidity,
                 borderColor: CHART_COLORS.blue,
                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                 yAxisID: 'yH',
@@ -148,12 +131,30 @@ async function setupChart() {
             }
         ]
     };
-    
+
+    // update x ticks callback
+    options.scales.x.ticks.callback = getChartTicksCallbackForInterval(labels_skip);
+
     let config = {
         type: 'line',
-        data: data,
+        data: chart_data,
         options: options,
     };
+
+    main_chart = new Chart(ctx, config);
+}
+
+// actually updates the chart
+function updateChartWithData(temperature, humidity, labels, labels_skip) {
+
+    // update chart data
+    main_chart.data.labels = labels;
+    main_chart.data.datasets[0].data = temperature;
+    main_chart.data.datasets[1].data = humidity;
     
-    const main_chart = new Chart(ctx, config);
+    // update x ticks callback
+    main_chart.options.scales.x.ticks.callback = getChartTicksCallbackForInterval(labels_skip);
+
+    // update chart
+    main_chart.update();
 }
