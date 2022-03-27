@@ -112,11 +112,20 @@ def post_humiture():
         print(e)
         return json.dumps({"success": False}), 400
 
-@app.route('/chart_data', methods=['GET'])
-def get_chart_data():
+@app.route('/chart_data/<period>', methods=['GET'])
+def get_chart_data(period):
 
     total_period = 24  # how many hours back we want to go
     nb_points = 50
+
+    if period == "day":
+        total_period = 24
+    elif period == "week":
+        total_period = 24*7
+    elif period == "all":   
+        pass        # TODO: update total_period
+    else:
+        return Response(json.dumps({"success": False}), mimetype='application/json', status=400)
 
     interval = total_period / nb_points  # in hours
     curDate = datetime.now() - timedelta(hours=total_period)
