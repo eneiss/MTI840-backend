@@ -117,16 +117,10 @@ async function setupChart() {
 async function loadDashboardInfo() {
     let url = root_url + 'dashboard_info';
     try {
-        let last_data = await (await fetch(url + '/last_data')).json();
-        let state = await (await fetch(url + '/status')).json();
-        console.log(last_data, state);
-        document.getElementById("status").innerHTML = state.status;
-
-        // TODO: split last data and use it to update dashboard
-        // if (last_data === null) {
-        //     last_data = 
-        // }
-        document.getElementById("last_data").innerHTML = last_data.last_data;
+        let data = await (await fetch(url)).json();
+        console.log(data);
+        document.getElementById("status").innerHTML = data.status;
+        document.getElementById("last_data").innerHTML = data.last_data.date + "<br/>" + data.last_data.temperature + "°C, " + data.last_data.humidity + "%";
     } catch (error) {
         console.log(error);
     }

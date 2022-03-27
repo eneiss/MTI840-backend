@@ -54,7 +54,10 @@ last_data_point = None
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
-    # return "<p>MTI840 API</p>", 200
+
+@app.route('/parameters', methods=['GET'])
+def get_parameters_page():
+    return render_template('parameters.html')
 
 @app.route('/test', methods=['GET'])
 def get_test():
@@ -87,7 +90,7 @@ def post_humiture():
         humiture_file_writer.writerow([datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature])
 
         # update last data point
-        last_data_point = [datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature]
+        last_data_point = {"date": datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), "humidity": humidity, "temperature": temperature}
 
         warning = Warnings.NONE
 
@@ -107,17 +110,14 @@ def post_humiture():
             else:
                 last_too_humid_time = datetime.now()
 
-            # else:
-                # warning = Warnings.TEMP_TOO_LOW
-
         return json.dumps({"success": True, "warning": warning}), 201
 
     except KeyError:
-        return json.dumps({"success": False, "error": "KeyError"}), 400
+        return Response(json.dumps({"success": False, "error": "KeyError"}), status=400, mimetype='application/json')
 
     except Exception as e: 
         print(e)
-        return json.dumps({"success": False}), 400
+        return Response(json.dumps({"success": False}), mimetype='application/json', status=500)
 
 @app.route('/chart_data/<period>', methods=['GET'])
 def get_chart_data(period):
@@ -211,23 +211,48 @@ def get_chart_data(period):
     }), mimetype='application/json')
 
 # get the current state of the app (itsok, too_humid, etc.) or the last data point
-@app.route('/dashboard_info/<info>', methods=['GET'])
-def get_dashboard_info(info):
-    if (info == "status"):
-        return Response(json.dumps({"status": app_state.name}), mimetype='application/json')
-    elif (info == "last_data"):
-        # read last line of the csv file
-        return Response(json.dumps({"last_data": last_data_point}) , mimetype='application/json')
+@app.route('/dashboard_info/', methods=['GET'])
+def get_dashboard_info():
+
+    global last_data_point
+
+    last_data = last_data_point
+
+    if last_data is None:
+        humiture_file.seek(0)
+        for row in humiture_file_reader :
+            date = datetime.strptime(row[0], "%d/%m/%Y, %H:%M:%S")
+            humidity = int(row[1])
+            temperature = int(row[2])
+            last_data = {"date": date, "humidity": humidity, "temperature": temperature}
+        # update last_data_point value with csv data
+        last_data_point = last_data
+
+    return Response(json.dumps({
+        "last_data": last_data,
+        "status": app_state.name
+        }) , mimetype='application/json')
 
 # get current model parameters
 @app.route("/parameters/<value>", methods=['GET'])
 def get_parameters(value):
+    print(value)
     if value == "max_humidity":
         return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
     elif value == "humidity_threshold":
         return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
-
-    # TODO: parameters for night mode (night_start, night_end)
+    elif value == "night_start_hour":
+        return Response(json.dumps({"night_start_hour": NIGHT_START_HOUR}), mimetype='application/json')
+    elif value == "night_end_hour":
+        return Response(json.dumps({"night_end_hour": NIGHT_END_HOUR}), mimetype='application/json')
+    elif value == "all":
+        res = {
+            "max_humidity": MAX_HUMIDITY,
+            "humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN,
+            "night_start_hour": NIGHT_START_HOUR,
+            "night_end_hour": NIGHT_END_HOUR
+        }
+        return Response(json.dumps(res), mimetype='application/json')
 
 # set new model parameters
 @app.route("/parameters/<value>", methods=['POST'])
@@ -238,8 +263,27 @@ def set_parameters(value):
     elif value == "humidity_threshold":
         MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.form['humidity_threshold'])
         return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
+    elif value == "night_start_hour":
+        NIGHT_START_HOUR = int(request.form['night_start_hour'])
+        return Response(json.dumps({"night_start_hour": NIGHT_START_HOUR}), mimetype='application/json')
+    elif value == "night_end_hour":
+        NIGHT_END_HOUR = int(request.form['night_end_hour'])
+        return Response(json.dumps({"night_end_hour": NIGHT_END_HOUR}), mimetype='application/json')
+    elif value == "all":
+        MAX_HUMIDITY = int(request.form['max_humidity']) if request.form['max_humidity'] is not None else MAX_HUMIDITY
+        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.form['humidity_threshold']) if request.form['humidity_threshold'] is not None else MAX_HUMIDITY_MARGIN
+        NIGHT_START_HOUR = int(request.form['night_start_hour']) if request.form['night_start_hour'] is not None else NIGHT_START_HOUR
+        NIGHT_END_HOUR = int(request.form['night_end_hour']) if request.form['night_end_hour'] is not None else NIGHT_END_HOUR
 
-    # TODO: parameters for night mode (night_start, night_end)
+        return Response(json.dumps({
+            "max_humidity": MAX_HUMIDITY, 
+            "humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN, 
+            "night_start_hour": NIGHT_START_HOUR, 
+            "night_end_hour": NIGHT_END_HOUR
+            }), mimetype='application/json')
+    else:
+        return Response(json.dumps({"error": "invalid parameter"}), mimetype='application/json', status=400)
+
 
 # ------------------------------ METHODS
 

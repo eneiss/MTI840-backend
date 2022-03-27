@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='parameters.js') }}"></script>
+<script src="{{ url_for('static', filename='dontcommit.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Parameters</h1>
+<div>
+  <p>
+    Current maximum humidity before alert: <span id="max_humidity">loading...</span><br/>
+    Current humidity threshold for acceptable humidity: <span id="humidity_threshold">loading...</span>
+  </p>
+  <script>
+    loadParameters();
+  </script>
+</div>
+{% endblock %}
