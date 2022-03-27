@@ -94,7 +94,7 @@ def post_humiture():
         if app_state == AppState.ITSOK:
             if humidity > MAX_HUMIDITY:
                 last_too_humid_time = datetime.now()
-                warning = "too_humid"
+                warning = Warnings.TOO_HUMID
                 switch_state(AppState.TOO_HUMID)
 
         elif app_state == AppState.TOO_HUMID:
