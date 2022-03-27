@@ -113,6 +113,25 @@ async function setupChart() {
     setupChartWithData(res.temperature, res.humidity, res.labels, 3)
 }
 
+// load dashboard info (state & last data)
+async function loadDashboardInfo() {
+    let url = root_url + 'dashboard_info';
+    try {
+        let last_data = await (await fetch(url + '/last_data')).json();
+        let state = await (await fetch(url + '/status')).json();
+        console.log(last_data, state);
+        document.getElementById("status").innerHTML = state.status;
+
+        // TODO: split last data and use it to update dashboard
+        // if (last_data === null) {
+        //     last_data = 
+        // }
+        document.getElementById("last_data").innerHTML = last_data.last_data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // called when a button is clicked
 async function updateChartForPeriod(period) {
     let res = await getChartDataForPeriod(period);

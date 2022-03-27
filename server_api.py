@@ -45,6 +45,8 @@ humiture_file_reader = csv.reader(humiture_file, delimiter=';')
 humiture_file.seek(0)
 humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
+last_data_point = None
+
 # ------------------------------ API ROUTES
 
 @app.route('/')
@@ -72,6 +74,7 @@ def post_humiture():
     global last_too_humid_time
     global app_state
     global humiture_file_writer
+    global last_data_point
 
     try:
         print(request.json)
@@ -82,6 +85,9 @@ def post_humiture():
         # TODO: open & close only once
         # with open('humiture_data.csv', mode='a', newline="") as humiture_file:
         humiture_file_writer.writerow([datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature])
+
+        # update last data point
+        last_data_point = [datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature]
 
         warning = Warnings.NONE
 
@@ -194,6 +200,15 @@ def get_chart_data(period):
         "humidity": [data[i][1] for i in range(len(data))]
     }), mimetype='application/json')
 
+# get the current state of the app (itsok, too_humid, etc.) or the last data point
+@app.route('/dashboard_info/<info>', methods=['GET'])
+def get_dashboard_info(info):
+    if (info == "status"):
+        return Response(json.dumps({"status": app_state.name}), mimetype='application/json')
+    elif (info == "last_data"):
+        # read last line of the csv file
+        return Response(json.dumps({"last_data": last_data_point}) , mimetype='application/json')
+
 # ------------------------------ METHODS
 
 def switch_state(new_state: int):
@@ -203,7 +218,7 @@ def switch_state(new_state: int):
 
 def keyboardInterruptHandler(signal, frame):
     print("Shutting down server...")
-    # TODO: close the csv file here
+    humiture_file.close()
     exit(0)
 
 # ------------------------------ MAIN

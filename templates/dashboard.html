@@ -11,13 +11,20 @@
 
 {% block content %}
 <h1>Dashboard</h1>
+<div>
+  <h2>Current status: <span id="status">loading...</span></h2>
+  <p>Last update: <span id="last_data">loading...</span></p>
+  <script>
+    loadDashboardInfo();
+  </script>
+</div>
 <div style="position: relative; height:40vh; width:80vw">
-  <canvas id="chart"></canvas>
   <div class="button-group">
     <button onclick="updateChartForPeriod('day')">Day</button>
     <button onclick="updateChartForPeriod('week')">Week</button>
     <button onclick="updateChartForPeriod('all')">All</button>
   </div> 
+  <canvas id="chart"></canvas>
   <script>
     setupChart();
   </script>
