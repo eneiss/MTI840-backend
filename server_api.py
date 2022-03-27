@@ -128,8 +128,13 @@ def get_chart_data(period):
         total_period = 24
     elif period == "week":
         total_period = 24*7
-    elif period == "all":   
-        pass        # TODO: update total_period
+    elif period == "all":
+        humiture_file.seek(0)
+        for row in humiture_file_reader :
+            date = datetime.strptime(row[0], "%d/%m/%Y, %H:%M:%S")
+            total_period = (datetime.now() - date).total_seconds() / 3600
+            break
+        # print("total_period :", total_period, "hours,    interval :", total_period / nb_points, "hours")
     else:
         return Response(json.dumps({"success": False}), mimetype='application/json', status=400)
 
@@ -176,6 +181,10 @@ def get_chart_data(period):
 
         # print("Read line", date, "  :  ", humidity, temperature)
 
+    for i in range(nb_points - len(data)) :
+        curDate += timedelta(hours=interval)
+        data.append([curDate, None, None])
+
     last = [None, None, None]
     for i in range(len(data)):
         if data[i][1] is None and last[1] is not None:
@@ -195,9 +204,9 @@ def get_chart_data(period):
 
     return Response(json.dumps({
         'size': len(data),
-        'labels': [data[i][0] for i in range(len(data))],
-        "temperature": [data[i][2] for i in range(len(data))],
-        "humidity": [data[i][1] for i in range(len(data))]
+        'labels': [data[i][0].strftime("%d/%m, %H:%M") for i in range(len(data))],
+        "temperature": [round(float(data[i][2]), 1) for i in range(len(data))],
+        "humidity": [round(float(data[i][1]), 1) for i in range(len(data))]
     }), mimetype='application/json')
 
 # get the current state of the app (itsok, too_humid, etc.) or the last data point
