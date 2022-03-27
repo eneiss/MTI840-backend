@@ -30,6 +30,8 @@ MAX_HUMIDITY = 60
 MAX_HUMIDITY_MARGIN = 5     # margin taken from max humidity to send the "humidity ok now" signal
 MIN_TEMPERATURE = 5
 BUFFERING_TIME = 20     # in seconds
+NIGHT_START_HOUR = 22
+NIGHT_END_HOUR = 9
 
 # ------------------------------ CONFIG & VARIABLES
 
@@ -82,8 +84,6 @@ def post_humiture():
         temperature = int(request.json['temperature'])
 
         # write humiture data to csv file
-        # TODO: open & close only once
-        # with open('humiture_data.csv', mode='a', newline="") as humiture_file:
         humiture_file_writer.writerow([datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature])
 
         # update last data point
@@ -92,7 +92,7 @@ def post_humiture():
         warning = Warnings.NONE
 
         if app_state == AppState.ITSOK:
-            if humidity > MAX_HUMIDITY:
+            if humidity > MAX_HUMIDITY and NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
                 last_too_humid_time = datetime.now()
                 warning = Warnings.TOO_HUMID
                 switch_state(AppState.TOO_HUMID)
@@ -101,7 +101,8 @@ def post_humiture():
             # if temperature > MIN_TEMPERATURE:       # temperature ok
             if humidity < MAX_HUMIDITY - MAX_HUMIDITY_MARGIN:   # humidity ok
                 if (datetime.now() - last_too_humid_time).total_seconds() >= BUFFERING_TIME:      # humidity values have stabilized below the threshold
-                    warning = Warnings.HUMIDITY_OK
+                    if NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
+                        warning = Warnings.HUMIDITY_OK
                     switch_state(AppState.ITSOK)
             else:
                 last_too_humid_time = datetime.now()
