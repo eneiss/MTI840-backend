@@ -33,9 +33,9 @@ BUFFERING_TIME = 20     # in seconds
 
 # ------------------------------ CONFIG & VARIABLES
 
-api = Flask(__name__)
-api.config['TESTING'] = True
-api.config['TEMPLATES_AUTO_RELOAD'] = True
+app = Flask(__name__)
+app.config['TESTING'] = True
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 app_state = AppState.ITSOK
 last_too_humid_time = 0
@@ -47,16 +47,16 @@ humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', q
 
 # ------------------------------ API ROUTES
 
-@api.route('/')
+@app.route('/')
 def dashboard():
     return render_template('dashboard.html')
     # return "<p>MTI840 API</p>", 200
 
-@api.route('/test', methods=['GET'])
+@app.route('/test', methods=['GET'])
 def get_test():
     return json.dumps(TEST_RES)
 
-@api.route('/humiture', methods=['POST'])
+@app.route('/humiture', methods=['POST'])
 def post_humiture():
     # with open('humiture_data.csv', mode='r', newline="") as csv_file:
     #
@@ -112,7 +112,7 @@ def post_humiture():
         print(e)
         return json.dumps({"success": False}), 400
 
-@api.route('/chart_data', methods=['GET'])
+@app.route('/chart_data', methods=['GET'])
 def get_chart_data():
 
     total_period = 24  # how many hours back we want to go
@@ -202,4 +202,4 @@ def keyboardInterruptHandler(signal, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, keyboardInterruptHandler)
     # api.run(host="0.0.0.0")     # open to the rest of the network
-    api.run()
+    app.run()
