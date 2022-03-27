@@ -218,6 +218,28 @@ def get_dashboard_info(info):
         # read last line of the csv file
         return Response(json.dumps({"last_data": last_data_point}) , mimetype='application/json')
 
+# get current model parameters
+@app.route("/parameters/<value>", methods=['GET'])
+def get_parameters(value):
+    if value == "max_humidity":
+        return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
+    elif value == "humidity_threshold":
+        return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
+
+    # TODO: parameters for night mode (night_start, night_end)
+
+# set new model parameters
+@app.route("/parameters/<value>", methods=['POST'])
+def set_parameters(value):
+    if value == "max_humidity":
+        MAX_HUMIDITY = int(request.form['max_humidity'])
+        return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
+    elif value == "humidity_threshold":
+        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.form['humidity_threshold'])
+        return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
+
+    # TODO: parameters for night mode (night_start, night_end)
+
 # ------------------------------ METHODS
 
 def switch_state(new_state: int):
