@@ -154,3 +154,4 @@ cython_debug/
 # Custom files
 humiture_data.csv
 dontcommit.js
+webhook_url.txt

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Parameters{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -11,11 +11,35 @@
 
 {% block content %}
 <h1>Parameters</h1>
-<div>
-  <p>
-    Current maximum humidity before alert: <span id="max_humidity">loading...</span><br/>
-    Current humidity threshold for acceptable humidity: <span id="humidity_threshold">loading...</span>
-  </p>
+
+<a href="{{ url_for('dashboard') }}">Back</a>
+
+<div class="form-container">
+  <div>
+    Current maximum humidity before alert:
+    <span class="align-right">
+      <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="max_humidity"><span>%</span>
+    </span>
+  </div>
+  <div>
+    Current humidity threshold for acceptable humidity:
+    <span class="align-right">
+      <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="humidity_threshold"><span>%</span>
+    </span>
+  </div>
+  <div>
+    Current night start time (24-hour format):
+    <span class="align-right">
+      <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_start_hour"><span>h</span>
+    </span>
+  </div>
+  <div>
+    Current night end time (24-hour format):
+    <span class="align-right">
+      <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_end_hour"><span>h</span>
+    </span>
+  </div>
+  <button onclick="enterEditMode()" id="edition-validation">Edit parameters</button>
   <script>
     loadParameters();
   </script>

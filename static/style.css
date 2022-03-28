@@ -1,32 +1,69 @@
 h1 {
-    font-family: 'Arimo', sans-serif;
+  font-family: 'Arimo', sans-serif;
 }
 
+body {
+  font-family: 'Arimo', sans-serif;
+}
+
+#content {
+  margin: 0 5%;
+  padding: 0;
+}
+
+.form-container {
+  overflow: hidden;
+  width: 70%; 
+  float: left;
+  clear: both;
+  background-color: aqua;
+}
+
+.align-right {
+  float: right;
+  overflow: hidden;
+}
+
+input.non-editable {
+  text-align: right;
+  border: none;
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  padding: none;
+  width: auto;
+  width: 2rem;
+}
+
+input.editable {
+  text-align: right;
+  width: 2rem;
+}
 
 /* Button group style based on W3Schools example
-   https://www.w3schools.com/howto/howto_css_button_group.asp
- */
-.button-group button {
-    background-color: #04AA6D; /* Green background */
-    border: 1px solid green; /* Green border */
-    color: white; /* White text */
-    padding: 10px 24px; /* Some padding */
-    cursor: pointer; /* Pointer/hand icon */
-    float: left; /* Float the buttons side by side */
-  }
-  
-  .button-group button:not(:last-child) {
-    border-right: none; /* Prevent double borders */
-  }
-  
-  /* Clear floats (clearfix hack) */
-  .button-group:after {
-    content: "";
-    clear: both;
-    display: table;
-  }
-  
-  /* Add a background color on hover */
-  .button-group button:hover {
-    background-color: #3e8e41;
-  }
+https://www.w3schools.com/howto/howto_css_button_group.asp
+*/
+button {
+  background-color: #04AA6D; /* Green background */
+  border: 1px solid green; /* Green border */
+  color: white; /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  float: left; /* Float the buttons side by side */
+}
+
+.button-group button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats (clearfix hack) */
+.button-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Add a background color on hover */
+.button-group button:hover {
+  background-color: #3e8e41;
+}
