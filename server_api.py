@@ -269,12 +269,10 @@ def get_parameters(value):
 # set new model parameters
 @app.route("/api/parameters/<value>", methods=['POST'])
 def set_parameters(value):
-    print("POST on /parameters/<value>")
     global MAX_HUMIDITY
     global MAX_HUMIDITY_MARGIN
     global NIGHT_START_HOUR
     global NIGHT_END_HOUR
-    print(">>> JSON: ", request.json)
 
     if value == "max_humidity":
         MAX_HUMIDITY = int(request.json['max_humidity'])
