@@ -10,29 +10,44 @@
 {% endblock %}
 
 {% block content %}
-<h1>Parameters</h1>
+<div class="jumbotron p-3">
+  <h1>Parameters</h1>
+</div>
 
-<a href="{{ url_for('dashboard') }}" class="navigation">Back</a>
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back</a>
 <br/><br/>
 
-<div class="form-container">
+<div class="card bg-light p-1" style="width: 30rem;">
+  <div class="card-body">
+    Current maximum humidity before alert:
+    <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="max_humidity"><span>%</span><br/>
+    Current humidity threshold for acceptable humidity:
+    <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="humidity_threshold"><span>%</span><br/>
+    Current night start time (24-hour format):
+    <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_start_hour"><span>h</span><br/>
+    Current night end time (24-hour format):
+    <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_end_hour"><span>h</span><br/>
+    <br/>
+    <button onclick="enterEditMode()" id="edition-validation" class="btn btn-primary">Edit parameters</button>
+    <script>
+      loadParameters();
+    </script>
+  </div>
+</div><br/>
+
+<!-- <div class="form-container">
   Current maximum humidity before alert:
   <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="max_humidity"><span>%</span><br/>
-
   Current humidity threshold for acceptable humidity:
   <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="humidity_threshold"><span>%</span><br/>
-  
   Current night start time (24-hour format):
   <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_start_hour"><span>h</span><br/>
-  
   Current night end time (24-hour format):
   <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_end_hour"><span>h</span><br/>
-  
   <br/>
-  
-  <button onclick="enterEditMode()" id="edition-validation">Edit parameters</button>
+  <button onclick="enterEditMode()" id="edition-validation" class="btn btn-primary">Edit parameters</button>
   <script>
     loadParameters();
   </script>
-</div>
+</div> -->
 {% endblock %}

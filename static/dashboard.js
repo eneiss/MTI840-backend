@@ -201,3 +201,18 @@ function updateChartWithData(temperature, humidity, labels, labels_skip) {
     // update chart
     main_chart.update();
 }
+
+$(document).on('change', 'input:radio[id^="radio_button_"]', function(event) {
+    console.log(this);
+    switch(this.id) {
+        case "radio_button_all":
+            updateChartForPeriod("all");
+            break;
+        case "radio_button_week":
+            updateChartForPeriod("week");
+            break;
+        case "radio_button_day":
+            updateChartForPeriod("day");
+            break;
+    }
+}) ;

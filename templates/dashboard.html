@@ -4,27 +4,39 @@
 
 {% block head %}
 {{ super() }}
+<!-- Other & custom -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-<script src="{{ url_for('static', filename='dontcommit.js') }}"></script>
-{% endblock %}
-
+<script src="{{ url_for('static', filename='dontcommit.js') }}"></script>{% endblock %}
 {% block content %}
-<h1>Dashboard</h1>
+<div class="jumbotron p-3">
+  <h1>Dashboard</h1>
+</div>
 <div>
-  <h2>Current status: <span id="status">loading...</span></h2>
-  <p>Last update: <span id="last_data">loading...</span></p>
-  <p><a href="{{ url_for('get_parameters_page') }}" class="navigation">Model parameters</a></p>
+  <h3>Current status: <span id="status">loading...</span></h3><br/>
+
+  <div class="card bg-light p-1" style="width: 20rem;">
+    <div class="card-body">Last update: <span id="last_data">loading...</span></div>
+  </div><br/>
+
+  <p><a href="{{ url_for('get_parameters_page') }}" class="btn btn-primary">Model parameters</a></p>
   <script>
     loadDashboardInfo();
   </script>
 </div>
-<div style="position: relative; height:40vh; width:90%; text-align: center;">
-  <div class="button-group align-right">
-    <button onclick="updateChartForPeriod('day')">Day</button>
-    <button onclick="updateChartForPeriod('week')">Week</button>
-    <button onclick="updateChartForPeriod('all')">All</button>
-  </div> 
+
+<div id="chart_container">
+  <div class="btn-group btn-group-toggle" data-toggle="buttons" id="periodButtonGroup">
+    <label class="btn btn-secondary">
+      <input type="radio" name="options" id="radio_button_day" autocomplete="off"> Day
+    </label>
+    <label class="btn btn-secondary">
+      <input type="radio" name="options" id="radio_button_week" autocomplete="off"> Week
+    </label>
+    <label class="btn btn-secondary active">
+      <input type="radio" name="options" id="radio_button_all" autocomplete="off"> All
+    </label>
+  </div>
   <canvas id="chart"></canvas>
   <script>
     setupChart();

@@ -10,8 +10,6 @@ async function loadParameters() {
 }
 
 async function enterEditMode() {
-    console.log("enter edit mode");
-    
     let button = document.getElementById("edition-validation");
     button.onclick = confirmEdit;
     button.innerHTML = "Confirm edit";
@@ -36,7 +34,6 @@ async function enterEditMode() {
 }
 
 async function confirmEdit() {
-    console.log("confirm edit");
     let button = document.getElementById("edition-validation");
     button.onclick = enterEditMode;
     button.innerHTML = "Edit parameters";
@@ -74,5 +71,5 @@ async function confirmEdit() {
     });
 
     let fetched_parameters = await res.json();
-    console.log("fetched: " + fetched_parameters);
+    console.log(fetched_parameters);
 }
