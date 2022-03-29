@@ -94,6 +94,7 @@ def post_humiture():
         temperature = int(request.json['temperature'])
 
         # write humiture data to csv file
+        humiture_file.seek(0)
         humiture_file_writer.writerow([datetime.now().strftime("%d/%m/%Y, %H:%M:%S"), humidity, temperature])
 
         # update last data point
@@ -102,10 +103,10 @@ def post_humiture():
         warning = Warnings.NONE
 
         if app_state == AppState.ITSOK:
-            if humidity > MAX_HUMIDITY and NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
-                # TODO: update FSM if we want the webhook to send a notification when humidity is too high even in the night
+            if humidity > MAX_HUMIDITY :
                 last_too_humid_time = datetime.now()
-                warning = Warnings.TOO_HUMID
+                if NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
+                    warning = Warnings.TOO_HUMID
                 switch_state(AppState.TOO_HUMID)
                 sendWebhookNotification(f":warning: Humidity is too high: {humidity}% (threshold at {MAX_HUMIDITY}%)")
 
@@ -177,11 +178,12 @@ def get_chart_data(period):
                     [curDate - timedelta(hours=interval),
                      current_point_sum[0] / current_point_count,
                      current_point_sum[1] / current_point_count])
-            # print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
+            print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
             current_point_count = 0
             current_point_sum = [0, 0]
 
         if len(data) == nb_points:
+            print("done")
             break
 
         humidity = int(row[1])
@@ -210,8 +212,8 @@ def get_chart_data(period):
             data[i][2] = last[2]
         last = data[i]
 
-    # for line in data :
-    #     print(line)
+    for line in data :
+        print(line)
 
     return Response(json.dumps({
         'size': len(data),
@@ -332,7 +334,7 @@ def sendWebhookNotification(message: str):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, keyboardInterruptHandler)
-    # app.run(host="0.0.0.0")     # open to the rest of the network
+    # app.run(host="0.0.0.0", port=8080)     # open to the rest of the network
     try:
         app.run()
     except Exception as e:
