@@ -6,6 +6,7 @@ import signal
 import csv
 import pathlib
 import os
+import requests
 
 # Change current working directory to that of this file
 os.chdir(pathlib.Path(__file__).parent.resolve())
@@ -49,7 +50,12 @@ humiture_file_writer = csv.writer(humiture_file, delimiter=';', quotechar='"', q
 
 last_data_point = None
 
+webhook_url_file = open('webhook_url.txt', 'r')
+webhook_url = webhook_url_file.read().strip()
+
 # ------------------------------ API ROUTES
+
+# TODO: group api calls in /api/
 
 @app.route('/')
 def dashboard():
@@ -96,9 +102,11 @@ def post_humiture():
 
         if app_state == AppState.ITSOK:
             if humidity > MAX_HUMIDITY and NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
+                # TODO: update FSM if we want the webhook to send a notification when humidity is too high even in the night
                 last_too_humid_time = datetime.now()
                 warning = Warnings.TOO_HUMID
                 switch_state(AppState.TOO_HUMID)
+                sendWebhookNotification(f":warning: Humidity is too high: {humidity}% (threshold at {MAX_HUMIDITY}%)")
 
         elif app_state == AppState.TOO_HUMID:
             # if temperature > MIN_TEMPERATURE:       # temperature ok
@@ -107,6 +115,7 @@ def post_humiture():
                     if NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
                         warning = Warnings.HUMIDITY_OK
                     switch_state(AppState.ITSOK)
+                    sendWebhookNotification(f":white_check_mark: Humidity is now ok: {humidity}% (stabilisation threshold at {MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}%)")
             else:
                 last_too_humid_time = datetime.now()
 
@@ -296,6 +305,20 @@ def keyboardInterruptHandler(signal, frame):
     print("Shutting down server...")
     humiture_file.close()
     exit(0)
+
+def sendWebhookNotification(message: str):
+    try:
+        data = {}
+        data["content"] = message
+        data["username"] = "Captain Poulet"
+        data["embeds"] = []
+
+        result = requests.post(webhook_url, json=data, headers={"Content-Type": "application/json"})
+
+        if result.status_code != 200:
+            print(f"Error sending webhook notification: {result.status_code}")
+    except:
+        print("Exception when sending webhook notification")
 
 # ------------------------------ MAIN
 
