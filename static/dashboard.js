@@ -119,8 +119,22 @@ async function loadDashboardInfo() {
     try {
         let data = await (await fetch(url)).json();
         console.log(data);
-        document.getElementById("status").innerHTML = data.status;
         document.getElementById("last_data").innerHTML = data.last_data.date + "<br/>" + data.last_data.temperature + "°C, " + data.last_data.humidity + "%";
+        
+        switch (data.status) {
+            case "ITSOK":
+                document.getElementById("status").innerHTML = "Everything is fine!";
+                document.getElementById("status").style.color = "green";
+                break;
+            case "TOO_HUMID":
+                document.getElementById("status").innerHTML = "Room is too humid!";
+                document.getElementById("status").style.color = "red";
+                break;
+            default:
+                document.getElementById("status").innerHTML = "Unknown status";
+                document.getElementById("status").style.color = "black";
+                break;
+        }
     } catch (error) {
         console.log(error);
     }
