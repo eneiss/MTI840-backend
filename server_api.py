@@ -315,7 +315,7 @@ def sendWebhookNotification(message: str):
 
         result = requests.post(webhook_url, json=data, headers={"Content-Type": "application/json"})
 
-        if result.status_code != 200:
+        if result.status_code != 204:   # 204 = no content (normal response)
             print(f"Error sending webhook notification: {result.status_code}")
     except:
         print("Exception when sending webhook notification")
