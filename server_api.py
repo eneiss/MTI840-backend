@@ -178,12 +178,11 @@ def get_chart_data(period):
                     [curDate - timedelta(hours=interval),
                      current_point_sum[0] / current_point_count,
                      current_point_sum[1] / current_point_count])
-            print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
+            # print("Chunk", curDate - timedelta(hours=interval), "to", curDate, "  :  ", data[-1])
             current_point_count = 0
             current_point_sum = [0, 0]
 
         if len(data) == nb_points:
-            print("done")
             break
 
         humidity = int(row[1])
@@ -194,9 +193,17 @@ def get_chart_data(period):
 
         # print("Read line", date, "  :  ", humidity, temperature)
 
-    for i in range(nb_points - len(data)) :
-        curDate += timedelta(hours=interval)
-        data.append([curDate, None, None])
+    if current_point_count != 0:
+        data.append(
+            [curDate,
+             current_point_sum[0] / current_point_count,
+             current_point_sum[1] / current_point_count])
+        # print("Chunk", curDate, "to", curDate + timedelta(hours=interval), "  :  ", data[-1])
+
+    if len(data) > 0 :
+        for i in range(nb_points - len(data)) :
+            curDate += timedelta(hours=interval)
+            data.append([curDate, None, None])
 
     last = [None, None, None]
     for i in range(len(data)):
@@ -212,8 +219,8 @@ def get_chart_data(period):
             data[i][2] = last[2]
         last = data[i]
 
-    for line in data :
-        print(line)
+    # for line in data :
+    #     print(line)
 
     return Response(json.dumps({
         'size': len(data),
