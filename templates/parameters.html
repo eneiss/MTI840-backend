@@ -13,32 +13,23 @@
 <h1>Parameters</h1>
 
 <a href="{{ url_for('dashboard') }}">Back</a>
+<br/><br/>
 
 <div class="form-container">
-  <div>
-    Current maximum humidity before alert:
-    <span class="align-right">
-      <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="max_humidity"><span>%</span>
-    </span>
-  </div>
-  <div>
-    Current humidity threshold for acceptable humidity:
-    <span class="align-right">
-      <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="humidity_threshold"><span>%</span>
-    </span>
-  </div>
-  <div>
-    Current night start time (24-hour format):
-    <span class="align-right">
-      <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_start_hour"><span>h</span>
-    </span>
-  </div>
-  <div>
-    Current night end time (24-hour format):
-    <span class="align-right">
-      <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_end_hour"><span>h</span>
-    </span>
-  </div>
+  Current maximum humidity before alert:
+  <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="max_humidity"><span>%</span><br/>
+
+  Current humidity threshold for acceptable humidity:
+  <input class="non-editable" disabled="true" type="text" min="0" max="100" value="..." id="humidity_threshold"><span>%</span><br/>
+  
+  Current night start time (24-hour format):
+  <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_start_hour"><span>h</span><br/>
+  
+  Current night end time (24-hour format):
+  <input class="non-editable" disabled="true" type="text" min="0" max="23" value="..." id="night_end_hour"><span>h</span><br/>
+  
+  <br/>
+  
   <button onclick="enterEditMode()" id="edition-validation">Edit parameters</button>
   <script>
     loadParameters();

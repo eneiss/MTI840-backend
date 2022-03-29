@@ -1,6 +1,6 @@
 
 async function loadParameters() {
-    let res = await fetch(root_url + 'parameters/all');
+    let res = await fetch(root_url + 'api/parameters/all');
     let parameters = await res.json();
     console.log(parameters);
     document.getElementById("max_humidity").value = parameters.max_humidity;
@@ -50,38 +50,29 @@ async function confirmEdit() {
     max_humidity.disabled = true;
 
     let night_start_hour = document.getElementById("night_start_hour");
-    max_humidity.classList = ["non-editable"];
-    max_humidity.disabled = true;
+    night_start_hour.classList = ["non-editable"];
+    night_start_hour.disabled = true;
 
     let night_end_hour = document.getElementById("night_end_hour");
-    max_humidity.classList = ["non-editable"];
-    max_humidity.disabled = true;
+    night_end_hour.classList = ["non-editable"];
+    night_end_hour.disabled = true;
 
-    postForm(root_url + 'parameters/all', {
-        max_humidity: max_humidity.value,
-        humidity_threshold: humidity_threshold.value,
-        night_start_hour: night_start_hour.value,
-        night_end_hour: night_end_hour.value
-    });
-}
-
-function postForm(path, params, method='post') {
-
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
-  
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-  
-        form.appendChild(hiddenField);
-      }
+    let data = {
+      max_humidity: max_humidity.value,
+      humidity_threshold: humidity_threshold.value,
+      night_start_hour: night_start_hour.value,
+      night_end_hour: night_end_hour.value
     }
-  
-    document.body.appendChild(form);
-    form.submit();
-  }
+
+    // post new parameters stored in data
+    let res = await fetch(root_url + 'api/parameters/all', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'  
+      },
+      body: JSON.stringify(data)
+    });
+
+    let fetched_parameters = await res.json();
+    console.log("fetched: " + fetched_parameters);
+}

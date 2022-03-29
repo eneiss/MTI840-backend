@@ -96,7 +96,7 @@ function getChartTicksCallbackForInterval(interval) {
 }
 
 async function getChartDataForPeriod(period) {
-    let url = root_url + 'chart_data/' + period;
+    let url = root_url + 'api/chart_data/' + period;
     try {
         let res = await fetch(url);
         return await res.json();
@@ -115,7 +115,7 @@ async function setupChart() {
 
 // load dashboard info (state & last data)
 async function loadDashboardInfo() {
-    let url = root_url + 'dashboard_info';
+    let url = root_url + 'api/dashboard_info';
     try {
         let data = await (await fetch(url)).json();
         console.log(data);

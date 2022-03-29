@@ -12,11 +12,7 @@ body {
 }
 
 .form-container {
-  overflow: hidden;
-  width: 70%; 
-  float: left;
-  clear: both;
-  background-color: aqua;
+  width: 50%; 
 }
 
 .align-right {

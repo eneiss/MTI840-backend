@@ -7,6 +7,7 @@ import csv
 import pathlib
 import os
 import requests
+from sys import stderr
 
 # Change current working directory to that of this file
 os.chdir(pathlib.Path(__file__).parent.resolve())
@@ -53,9 +54,7 @@ last_data_point = None
 webhook_url_file = open('webhook_url.txt', 'r')
 webhook_url = webhook_url_file.read().strip()
 
-# ------------------------------ API ROUTES
-
-# TODO: group api calls in /api/
+# ------------------------------ HTML ROUTES
 
 @app.route('/')
 def dashboard():
@@ -65,11 +64,13 @@ def dashboard():
 def get_parameters_page():
     return render_template('parameters.html')
 
-@app.route('/test', methods=['GET'])
+# ------------------------------ API ROUTES
+
+@app.route('/api/test', methods=['GET'])
 def get_test():
     return json.dumps(TEST_RES)
 
-@app.route('/humiture', methods=['POST'])
+@app.route('/api/humiture', methods=['POST'])
 def post_humiture():
     # with open('humiture_data.csv', mode='r', newline="") as csv_file:
     #
@@ -128,7 +129,7 @@ def post_humiture():
         print(e)
         return Response(json.dumps({"success": False}), mimetype='application/json', status=500)
 
-@app.route('/chart_data/<period>', methods=['GET'])
+@app.route('/api/chart_data/<period>', methods=['GET'])
 def get_chart_data(period):
 
     total_period = 24  # how many hours back we want to go
@@ -220,7 +221,7 @@ def get_chart_data(period):
     }), mimetype='application/json')
 
 # get the current state of the app (itsok, too_humid, etc.) or the last data point
-@app.route('/dashboard_info/', methods=['GET'])
+@app.route('/api/dashboard_info/', methods=['GET'])
 def get_dashboard_info():
 
     global last_data_point
@@ -243,7 +244,7 @@ def get_dashboard_info():
         }) , mimetype='application/json')
 
 # get current model parameters
-@app.route("/parameters/<value>", methods=['GET'])
+@app.route("/api/parameters/<value>", methods=['GET'])
 def get_parameters(value):
     print(value)
     if value == "max_humidity":
@@ -264,25 +265,32 @@ def get_parameters(value):
         return Response(json.dumps(res), mimetype='application/json')
 
 # set new model parameters
-@app.route("/parameters/<value>", methods=['POST'])
+@app.route("/api/parameters/<value>", methods=['POST'])
 def set_parameters(value):
+    print("POST on /parameters/<value>")
+    global MAX_HUMIDITY
+    global MAX_HUMIDITY_MARGIN
+    global NIGHT_START_HOUR
+    global NIGHT_END_HOUR
+    print(">>> JSON: ", request.json)
+
     if value == "max_humidity":
-        MAX_HUMIDITY = int(request.form['max_humidity'])
+        MAX_HUMIDITY = int(request.json['max_humidity'])
         return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
     elif value == "humidity_threshold":
-        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.form['humidity_threshold'])
+        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.json['humidity_threshold'])
         return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
     elif value == "night_start_hour":
-        NIGHT_START_HOUR = int(request.form['night_start_hour'])
+        NIGHT_START_HOUR = int(request.json['night_start_hour'])
         return Response(json.dumps({"night_start_hour": NIGHT_START_HOUR}), mimetype='application/json')
     elif value == "night_end_hour":
-        NIGHT_END_HOUR = int(request.form['night_end_hour'])
+        NIGHT_END_HOUR = int(request.json['night_end_hour'])
         return Response(json.dumps({"night_end_hour": NIGHT_END_HOUR}), mimetype='application/json')
     elif value == "all":
-        MAX_HUMIDITY = int(request.form['max_humidity']) if request.form['max_humidity'] is not None else MAX_HUMIDITY
-        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.form['humidity_threshold']) if request.form['humidity_threshold'] is not None else MAX_HUMIDITY_MARGIN
-        NIGHT_START_HOUR = int(request.form['night_start_hour']) if request.form['night_start_hour'] is not None else NIGHT_START_HOUR
-        NIGHT_END_HOUR = int(request.form['night_end_hour']) if request.form['night_end_hour'] is not None else NIGHT_END_HOUR
+        MAX_HUMIDITY = int(request.json['max_humidity']) if request.json['max_humidity'] is not None else MAX_HUMIDITY
+        MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.json['humidity_threshold']) if request.json['humidity_threshold'] is not None else MAX_HUMIDITY_MARGIN
+        NIGHT_START_HOUR = int(request.json['night_start_hour']) if request.json['night_start_hour'] is not None else NIGHT_START_HOUR
+        NIGHT_END_HOUR = int(request.json['night_end_hour']) if request.json['night_end_hour'] is not None else NIGHT_END_HOUR
 
         return Response(json.dumps({
             "max_humidity": MAX_HUMIDITY, 
@@ -324,5 +332,8 @@ def sendWebhookNotification(message: str):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, keyboardInterruptHandler)
-    # api.run(host="0.0.0.0")     # open to the rest of the network
-    app.run()
+    # app.run(host="0.0.0.0")     # open to the rest of the network
+    try:
+        app.run()
+    except Exception as e:
+        print(e, file=stderr)
