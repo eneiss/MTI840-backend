@@ -224,7 +224,7 @@ def get_chart_data(period):
 
     return Response(json.dumps({
         'size': len(data),
-        'labels': [data[i][0].strftime("%d/%m, %H:%M") for i in range(len(data))],
+        'labels': [(data[i][0] + timedelta(hours=interval)).strftime("%d/%m, %H:%M") for i in range(len(data))],
         "temperature": [round(float(data[i][2]), 1) for i in range(len(data))],
         "humidity": [round(float(data[i][1]), 1) for i in range(len(data))]
     }), mimetype='application/json')
