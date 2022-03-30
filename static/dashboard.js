@@ -127,8 +127,12 @@ async function loadDashboardInfo() {
                 document.getElementById("status").style.color = "green";
                 break;
             case "TOO_HUMID":
-                document.getElementById("status").innerHTML = "Room is too humid!";
+                document.getElementById("status").innerHTML = "Room air is too humid!";
                 document.getElementById("status").style.color = "red";
+                break;
+            case "too_dry":
+                document.getElementById("status").innerHTML = "Room air is too dry!";
+                document.getElementById("status").style.color = "orange";
                 break;
             default:
                 document.getElementById("status").innerHTML = "Unknown status";
@@ -213,6 +217,9 @@ $(document).on('change', 'input:radio[id^="radio_button_"]', function(event) {
             break;
         case "radio_button_day":
             updateChartForPeriod("day");
+            break;
+        case "radio_button_two_hours":
+            updateChartForPeriod("two_hours");
             break;
     }
 }) ;

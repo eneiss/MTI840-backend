@@ -27,14 +27,17 @@
 
 <div id="chart_container">
   <div class="btn-group btn-group-toggle" data-toggle="buttons" id="periodButtonGroup">
-    <label class="btn btn-secondary">
-      <input type="radio" name="options" id="radio_button_day" autocomplete="off"> Day
+    <label class="btn btn-secondary active">
+      <input type="radio" name="options" id="radio_button_all" autocomplete="off"> All
     </label>
     <label class="btn btn-secondary">
       <input type="radio" name="options" id="radio_button_week" autocomplete="off"> Week
     </label>
-    <label class="btn btn-secondary active">
-      <input type="radio" name="options" id="radio_button_all" autocomplete="off"> All
+    <label class="btn btn-secondary">
+      <input type="radio" name="options" id="radio_button_day" autocomplete="off"> Day
+    </label>
+    <label class="btn btn-secondary">
+      <input type="radio" name="options" id="radio_button_two_hours" autocomplete="off"> 2 hours
     </label>
   </div>
   <canvas id="chart"></canvas>

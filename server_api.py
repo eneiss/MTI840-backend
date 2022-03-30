@@ -140,6 +140,8 @@ def get_chart_data(period):
         total_period = 24
     elif period == "week":
         total_period = 24*7
+    elif period == "two_hours":
+        total_period = 2
     elif period == "all":
         humiture_file.seek(0)
         for row in humiture_file_reader :
@@ -247,9 +249,14 @@ def get_dashboard_info():
         # update last_data_point value with csv data
         last_data_point = last_data
 
+    # send a state more detailed than the one in the app (to inform the user if the room air is too dry too)
+    state = app_state.name
+    if app_state == AppState.ITSOK and last_data["humidity"] < MIN_HUMIDITY:
+        state = "too_dry"
+
     return Response(json.dumps({
         "last_data": last_data,
-        "status": app_state.name
+        "status": state
         }) , mimetype='application/json')
 
 # get current model parameters
