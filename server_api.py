@@ -341,7 +341,7 @@ def sendWebhookNotification(message: str):
     try:
         data = {}
         data["content"] = message
-        data["username"] = "Captain Poulet"
+        data["username"] = "Smart Home"
         data["embeds"] = []
 
         result = requests.post(webhook_url, json=data, headers={"Content-Type": "application/json"})
