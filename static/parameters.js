@@ -4,6 +4,7 @@ async function loadParameters() {
     let parameters = await res.json();
     console.log(parameters);
     document.getElementById("max_humidity").value = parameters.max_humidity;
+    document.getElementById("min_humidity").value = parameters.min_humidity;
     document.getElementById("humidity_threshold").value = parameters.humidity_threshold;
     document.getElementById("night_start_hour").value = parameters.night_start_hour;
     document.getElementById("night_end_hour").value = parameters.night_end_hour;
@@ -23,6 +24,10 @@ async function enterEditMode() {
     let max_humidity = document.getElementById("max_humidity");
     max_humidity.classList = ["editable"];
     max_humidity.disabled = false;
+
+    let min_humidity = document.getElementById("min_humidity");
+    min_humidity.classList = ["editable"];
+    min_humidity.disabled = false;
 
     let night_start_hour = document.getElementById("night_start_hour");
     night_start_hour.classList = ["editable"];
@@ -46,6 +51,10 @@ async function confirmEdit() {
     max_humidity.classList = ["non-editable"];
     max_humidity.disabled = true;
 
+    let min_humidity = document.getElementById("min_humidity");
+    min_humidity.classList = ["non-editable"];
+    min_humidity.disabled = true;
+
     let night_start_hour = document.getElementById("night_start_hour");
     night_start_hour.classList = ["non-editable"];
     night_start_hour.disabled = true;
@@ -56,6 +65,7 @@ async function confirmEdit() {
 
     let data = {
       max_humidity: max_humidity.value,
+      min_humidity: min_humidity.value,
       humidity_threshold: humidity_threshold.value,
       night_start_hour: night_start_hour.value,
       night_end_hour: night_end_hour.value

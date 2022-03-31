@@ -265,6 +265,8 @@ def get_parameters(value):
     print(value)
     if value == "max_humidity":
         return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
+    elif value == "min_humidity":
+        return Response(json.dumps({"min_humidity": MIN_HUMIDITY}), mimetype='application/json')
     elif value == "humidity_threshold":
         return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
     elif value == "night_start_hour":
@@ -274,6 +276,7 @@ def get_parameters(value):
     elif value == "all":
         res = {
             "max_humidity": MAX_HUMIDITY,
+            "min_humidity": MIN_HUMIDITY,
             "humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN,
             "night_start_hour": NIGHT_START_HOUR,
             "night_end_hour": NIGHT_END_HOUR
@@ -284,6 +287,7 @@ def get_parameters(value):
 @app.route("/api/parameters/<value>", methods=['POST'])
 def set_parameters(value):
     global MAX_HUMIDITY
+    global MIN_HUMIDITY
     global MAX_HUMIDITY_MARGIN
     global NIGHT_START_HOUR
     global NIGHT_END_HOUR
@@ -291,6 +295,9 @@ def set_parameters(value):
     if value == "max_humidity":
         MAX_HUMIDITY = int(request.json['max_humidity'])
         return Response(json.dumps({"max_humidity": MAX_HUMIDITY}), mimetype='application/json')
+    elif value == "min_humidity":
+        MIN_HUMIDITY = int(request.json['min_humidity'])
+        return Response(json.dumps({"min_humidity": MIN_HUMIDITY}), mimetype='application/json')
     elif value == "humidity_threshold":
         MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.json['humidity_threshold'])
         return Response(json.dumps({"humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN}), mimetype='application/json')
@@ -302,12 +309,14 @@ def set_parameters(value):
         return Response(json.dumps({"night_end_hour": NIGHT_END_HOUR}), mimetype='application/json')
     elif value == "all":
         MAX_HUMIDITY = int(request.json['max_humidity']) if request.json['max_humidity'] is not None else MAX_HUMIDITY
+        MIN_HUMIDITY = int(request.json['min_humidity']) if request.json['min_humidity'] is not None else MIN_HUMIDITY
         MAX_HUMIDITY_MARGIN = MAX_HUMIDITY - int(request.json['humidity_threshold']) if request.json['humidity_threshold'] is not None else MAX_HUMIDITY_MARGIN
         NIGHT_START_HOUR = int(request.json['night_start_hour']) if request.json['night_start_hour'] is not None else NIGHT_START_HOUR
         NIGHT_END_HOUR = int(request.json['night_end_hour']) if request.json['night_end_hour'] is not None else NIGHT_END_HOUR
 
         return Response(json.dumps({
             "max_humidity": MAX_HUMIDITY, 
+            "min_humidity": MIN_HUMIDITY,
             "humidity_threshold": MAX_HUMIDITY - MAX_HUMIDITY_MARGIN, 
             "night_start_hour": NIGHT_START_HOUR, 
             "night_end_hour": NIGHT_END_HOUR

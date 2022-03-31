@@ -46,7 +46,9 @@ const options =  {
                 font: {
                   size: 20,
                 },
-            }
+            },
+            suggestedMin: 16,
+            suggestedMax: 24,
         },
         yH: {
             type: 'linear',
@@ -67,7 +69,9 @@ const options =  {
                 font: {
                   size: 20,
                 },
-            }
+            },
+            suggestedMin: 20,
+            suggestedMax: 65,
         },
         x: {
             ticks: {
