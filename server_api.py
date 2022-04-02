@@ -105,7 +105,7 @@ def post_humiture():
         if app_state == AppState.ITSOK:
             if humidity > MAX_HUMIDITY :
                 last_too_humid_time = datetime.now()
-                if NIGHT_END_HOUR < datetime.now().hour < NIGHT_START_HOUR :
+                if NIGHT_END_HOUR <= datetime.now().hour < NIGHT_START_HOUR :
                     warning = Warnings.TOO_HUMID
                 switch_state(AppState.TOO_HUMID)
                 sendWebhookNotification(f":warning: Humidity is too high: {humidity}% (threshold at {MAX_HUMIDITY}%)")
@@ -348,8 +348,8 @@ def sendWebhookNotification(message: str):
 
         if result.status_code != 204:   # 204 = no content (normal response)
             print(f"Error sending webhook notification: {result.status_code}")
-    except:
-        print("Exception when sending webhook notification")
+    except Exception as e:
+        print("Exception when sending webhook notification:" + str(e))
 
 # ------------------------------ MAIN
 
